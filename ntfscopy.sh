@@ -43,9 +43,9 @@ if [ "$1" == "-h" ]; then
   exit 0
 fi
 
-if [ $EUID != 0 ]; then
-    sudo "$0" "$@"
-    exit $?
+if [[ $USER != "root" ]]; then
+  echo "This script must be run as root!"
+  exit 1
 fi
 
 # If more than 2 arguments are specified, then prints out 'too many arguments'
