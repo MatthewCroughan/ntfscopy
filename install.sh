@@ -1,11 +1,13 @@
-# Run as root
+# Check if root
 if [ $EUID != 0 ]; then
     sudo "$0" "$@"
     exit $?
 fi
 
+# Make config directory
 mkdir ~/.config/ntfscopy/
 
+# Get position of the script so that this being ran from elsewhere in the system doesn't impact the script
 SOURCE="${BASH_SOURCE[0]}"
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
@@ -23,6 +25,7 @@ if [ -z "$(which at)" ]; then
 	apt-get --no-install-recommends -y install at
 fi
 
+# Install
 cp ./ntfscopy.sh /usr/local/bin/ntfscopy.sh
 cp ./detected.sh /usr/local/bin/detected.sh
 
