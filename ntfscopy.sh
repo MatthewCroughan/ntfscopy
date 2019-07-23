@@ -14,6 +14,9 @@ display_usage() {
   exit 1
 }
 
+# Applies config settings from /etc/ntfscopy/config
+source /etc/ntfscopy/config
+
 # Tails the output of /var/log/ntfscopy
 monitor() {
   tail -f /var/log/ntfscopy
@@ -114,5 +117,5 @@ echo $dt USB drive $1 wiped formatted and ejected >> /var/log/ntfscopy
 # echo mmc0 | sudo tee /sys/class/leds/led0/trigger
 
 else
-	echo ""$DISK" does not exist, or is not a block device, you must specify a disk such as /dev/sda" 
+	echo "$DISK does not exist, or is not a block device, you must specify a disk such as /dev/sda" 
 fi
