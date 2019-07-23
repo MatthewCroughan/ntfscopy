@@ -29,7 +29,7 @@ fi
 cp ./ntfscopy.sh /usr/local/bin/ntfscopy.sh
 cp ./detected.sh /usr/local/bin/detected.sh
 
-echo 'KERNEL=="sd[a-z]", SUBSYSTEM=="block", ACTION=="add", RUN+="/usr/bin/sudo /usr/local/bin/ntfscopy/detected.sh $name"' | sudo tee /etc/udev/rules.d/99-ntfscopy.rules
+echo 'KERNEL=="sd[a-z]", SUBSYSTEM=="block", ACTION=="add", RUN+="/usr/bin/sudo /usr/local/bin/detected.sh $name"' | sudo tee /etc/udev/rules.d/99-ntfscopy.rules
 
 sudo udevadm control --reload-rules
 
