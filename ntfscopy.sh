@@ -46,17 +46,6 @@ if [[ "$1" == "monitor" ]]; then
   exit 0
 fi
 
-# Parses the contents of the second parameter if -d is present, and outputs that to the relative config directory.
-if [[ "$1" == "-d" && -d "$2" ]]
-then
-  echo "$2" > ~/.config/ntfscopy/copypath 
-  exit 0
-elif [[ "$1" == "-d" && "$2" -eq 0 ]]
-then
-  echo "The path specified is not a directory"
-  exit 0
-fi
-
 # Displays usage information if -h is present
 if [ "$1" == "-h" ]; then
   display_usage
@@ -64,8 +53,19 @@ if [ "$1" == "-h" ]; then
 fi
 
 if [[ $USER != "root" ]]; then
-  echo "This script must be run as root!"
+  echo "You must be root to do this!"
   exit 1
+fi
+
+# Parses the contents of the second parameter if -d is present, and outputs that to the relative config directory.
+if [[ "$1" == "-d" && -d "$2" ]]
+then
+  echo "COPYPATH=$2" > /etc/ntfscopy/config
+  exit 0
+elif [[ "$1" == "-d" && "$2" -eq 0 ]]
+then
+  echo "The path specified is not a directory"
+  exit 0
 fi
 
 DISK=/dev/$1

@@ -46,7 +46,7 @@ fi
 e_arrow "Installing ntfscopy"
 
 # Make config directory
-try mkdir -p ~/.config/ntfscopy/
+try sudo mkdir -p /etc/ntfscopy/
 # Get position of the script so that this being ran from elsewhere in the system doesn't impact the script
 try cd "$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -68,6 +68,6 @@ fi
 try sudo cp ./ntfscopy.sh /usr/local/bin/ntfscopy.sh
 try sudo cp ./detected.sh /usr/local/bin/detected.sh
 
-try echo 'KERNEL=="sd[a-z]", SUBSYSTEM=="block", ACTION=="add", RUN+="/usr/bin/sudo /usr/local/bin/detected.sh $name"' | sudo tee /etc/udev/rules.d/99-ntfscopy.rules > /dev/null 2>&1 && e_success "Installed udev rule"
+try echo 'KERNEL=="sd[a-z]", SUBSYSTEM=="block", ACTION=="add", RUN+="/usr/bin/sudo /usr/local/bin/ntfscopy.sh $name"' | sudo tee /etc/udev/rules.d/99-ntfscopy.rules > /dev/null 2>&1 && e_success "Installed udev rule"
 
 try sudo udevadm control --reload-rules && e_success "Reloading udev rules"
