@@ -1,7 +1,6 @@
-# Check if root
-if [ $EUID != 0 ]; then
-    sudo "$0" "$@"
-    exit $?
+if [[ $USER != "root" ]]; then
+  echo "This script must be run as root!"
+  exit 1
 fi
 
 # Make config directory
