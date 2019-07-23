@@ -13,16 +13,20 @@ display_usage() {
   exit 1
 }
 
+# Tails the output of /var/log/ntfscopy
 monitor() {
   tail -f /var/log/ntfscopy
   exit 1
 }
 
+
+# Runs monitor() if monitor is present.
 if [ "$1" == "monitor" ]; then
   monitor
   exit 0
 fi
 
+# Parses the contents of the second parameter if -d is present, and outputs that to the relative config directory.
 if [[ "$1" == "-d" && -d "$2" ]]
 then
   echo "$2" > ~/.config/ntfscopy/copypath 
@@ -33,6 +37,7 @@ then
   exit 0
 fi
 
+# Displays usage information if -h is present
 if [ "$1" == "-h" ]; then
   display_usage
   exit 0
@@ -43,6 +48,7 @@ if [ $EUID != 0 ]; then
     exit $?
 fi
 
+# If more than 2 arguments are specified, then prints out 'too many arguments'
 if (( $# > 2 )); then echo "too many arguments"; exit 1; fi
 
 if [[ $# -eq 0 ]] ; then
