@@ -68,6 +68,16 @@ fi
 try sudo cp ./ntfscopy.sh /usr/local/bin/ntfscopy.sh
 try sudo cp ./detected.sh /usr/local/bin/detected.sh
 
-try echo 'KERNEL=="sd[a-z]", SUBSYSTEM=="block", ACTION=="add", RUN+="/usr/bin/sudo /usr/local/bin/ntfscopy.sh $name"' | sudo tee /etc/udev/rules.d/99-ntfscopy.rules > /dev/null 2>&1 && e_success "Installed udev rule"
+#e_note "If these fail, the service likely does not exist, do not worry."
+
+#try sudo systemctl disable udisks2.service
+#try sudo systemctl stop udisks2.service
+
+try echo 'KERNEL=="sd[a-z]", SUBSYSTEM=="block", ACTION=="add", RUN+="/usr/bin/sudo /usr/local/bin/detected.sh $name", ATTR{timeout}="99999999999"' | sudo tee /etc/udev/rules.d/99-ntfscopy.rules > /dev/null 2>&1 && e_success "Installed udev rule"
+
+#try sudo mkdir -p /etc/systemd/system/systemd-udevd.service.d/
+#try echo -e "[Service]\nMountFlags=shared" | sudo tee /etc/systemd/system/systemd-udevd.service.d/override.conf > /dev/null 2>&1 && e_success "Override systemd mounting rules"
+#try sudo systemctl daemon-reload
+#try sudo service systemd-udevd --full-restart
 
 try sudo udevadm control --reload-rules && e_success "Reloading udev rules"

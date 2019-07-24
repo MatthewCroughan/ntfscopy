@@ -100,10 +100,18 @@ echo $dt Creating DOS partition on $1 >> /var/log/ntfscopy
 
 echo $dt Formatting drive $1 as NTFS  >> /var/log/ntfscopy
 # Formatting the drive as NTFS, requires ntfs-3g
-	sudo mkfs.ntfs -f /dev/"$1"1 >> /var/log/ntfscopy-verbose
+        sudo mkfs.ntfs -f /dev/"$1"1 >> /var/log/ntfscopy-verbose
+	echo "Mounting drive..." >> /var/log/ntfscopy-verbose
+#	runuser -l root -c "udisksctl mount -b "$DISK"1"
+	udisksctl mount -b "$DISK"1
+	udevil mount $DISK"1"
+	echo "Sleeping for 5..." >> /var/log/ntfscopy-verbose
+	sleep 5
+	echo "Attempting rsync" >> /var/log/ntfscopy-verbose
+#        sudo rsync -avz $COPYPATH/* $(df "$DISK"1 | awk 'END{print $NF}') >> /var/log/ntfscopy-verbose
 
-echo $dt Detaching $1 >> /var/log/ntfscopy
-	sudo udisksctl power-off -b $DISK >> /var/log/ntfscopy-verbose
+#echo $dt Detaching $1 >> /var/log/ntfscopy
+#	sudo udisksctl power-off -b $DISK >> /var/log/ntfscopy-verbose
 
 # Turn off LED 
 	echo 0 | sudo tee /sys/class/leds/led0/brightness 
@@ -115,6 +123,7 @@ echo $dt USB drive $1 wiped formatted and ejected >> /var/log/ntfscopy
 
 # To restore LED outside of script use this command
 # echo mmc0 | sudo tee /sys/class/leds/led0/trigger
+sudo rsync -avz $COPYPATH/* $(df "$DISK"1 | awk 'END{print $NF}') >> /var/log/ntfscopy-verbose
 
 else
 	echo "$DISK does not exist, or is not a block device, you must specify a disk such as /dev/sda" 

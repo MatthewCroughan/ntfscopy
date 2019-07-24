@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo >> /var/log/ntfscopy
 echo Started ntfscopy.sh >> /var/log/ntfscopy
