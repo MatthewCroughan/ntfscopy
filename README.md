@@ -23,11 +23,11 @@ Options:
 
 Set the *absolute* path of the directory containing the contents you want via `ntfscopy.sh -d [directory]`
 
-`home/pi` is a relative directory and will not work.
+`home/pi` is a relative directory and is **invalid**
 
-`~/home/pi` is also a relative directory and will not work.
+`~/home/pi` is also a relative directory and is **invalid**
 
-`/home/pi/downloads/copyfiles/` is an absolute directory and will work.
+`/home/pi/downloads/copyfiles/` is an absolute directory and is **valid**
 
 `ntfscopy.sh monitor` will monitor what is going on
 
