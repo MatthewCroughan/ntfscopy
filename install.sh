@@ -47,6 +47,7 @@ e_arrow "Installing ntfscopy"
 
 # Make config directory
 try sudo mkdir -p /etc/ntfscopy/
+try sudo touch /etc/ntfscopy/config
 # Get position of the script so that this being ran from elsewhere in the system doesn't impact the script
 try cd "$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
