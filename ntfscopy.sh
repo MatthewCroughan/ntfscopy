@@ -108,6 +108,9 @@ echo $dt Copying files from $COPYPATH to $MOUTPOINT  >> /var/log/ntfscopy
 	mount $DISK"1" $MOUNTPOINT
 	echo "Attempting rsync" >> /var/log/ntfscopy-verbose
 	sudo rsync -avz $COPYPATH/* $(df "$DISK"1 | awk 'END{print $NF}') >> /var/log/ntfscopy-verbose
+	
+echo $dt Unmounting $DISK"1"  >> /var/log/ntfscopy
+	umount $DISK"1"
 
 # Turn off LED 
 	echo 0 | sudo tee /sys/class/leds/led0/brightness 
