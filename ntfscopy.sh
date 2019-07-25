@@ -11,6 +11,7 @@ display_usage() {
   echo "    monitor verbose                       A more verbose version of monitor"
   echo "Options:"  
   echo "    -d                                    Specify the directory containing files with which to copy over with rsync"
+  echo "    -r                                    Reset the activity LED on the Pi"
   exit 1
 }
 
@@ -60,6 +61,12 @@ if [[ $USER != "root" ]]; then
   exit 1
 fi
 
+# Resets the activity LED of the pi, in case it is stuck.
+if [[ "$1" == "-r" ]]; then
+  echo mmc0 | sudo tee /sys/class/leds/led0/trigger
+  exit 0
+fi
+
 # Parses the contents of the second parameter if -d is present, and outputs that to the relative config directory.
 if [[ "$1" == "-d" && -d "$2" ]]
 then
@@ -72,56 +79,49 @@ then
 fi
 
 DISK=/dev/$1
+MOUNTPOINT=$(mktemp -dp /mnt/)
 
 if [ -b "$DISK" ]
 then
 
 # Start the logging process
 dt=$(date +'%b %d %T:')
-echo $dt Processing drive $1 >> /var/log/ntfscopy
+echo $dt Processing drive $1 | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
 
 # Debian 10 automounts usbs, this remedies that, and is good practice anyway.
-echo $dt Attempting to unmount all partitions on $1 >> /var/log/ntfscopy
-	umount /dev/"$1"?* >> /var/log/ntfscopy-verbose
+echo $dt Attempting to unmount all partitions on $1 | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
+	umount -v /dev/"$1"?* | sudo tee --append /var/log/ntfscopy-verbose
 
 # Place green LED on Pi3 in control mode
 	echo gpio | sudo tee /sys/class/leds/led0/trigger
-
 # Turn on the LED heatbeat mode to show activity 
 	echo heartbeat | sudo tee /sys/class/leds/led0/trigger
 
-echo $dt Zapping $1 with dd and sfdisk>> /var/log/ntfscopy
-	dd if=/dev/zero of=$DISK bs=4096 count=1 conv=notrunc,fsync
-	echo ',,L' | sudo sfdisk --wipe-partitions=always --wipe=always $DISK --no-reread --force >> /var/log/ntfscopy-verbose
+echo $dt Zapping $1 with dd and sfdisk | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
+echo $dt $(lsblk -o name,size,fstype,label,model,serial,mountpoint $DISK) | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
+	dd if=/dev/zero of=$DISK bs=4096 count=1 conv=notrunc,fsync | sudo tee --append /var/log/ntfscopy-verbose
+	echo ',,L' | sudo sfdisk --wipe-partitions=always --wipe=always $DISK --no-reread --force | sudo tee --append /var/log/ntfscopy-verbose
 
 # Using using sfdisk to create a new DOS partition on the drive
-echo $dt Creating DOS partition on $1 >> /var/log/ntfscopy
-	echo 'type=83' | sudo sfdisk $DISK >>/var/log/ntfscopy-verbose
+echo $dt Creating DOS partition on $1 | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
+	echo 'type=83' | sudo sfdisk $DISK | sudo tee --append /var/log/ntfscopy-verbose
 
-echo $dt Formatting drive $1 as NTFS  >> /var/log/ntfscopy
-# Formatting the drive as NTFS, requires ntfs-3g
-        sudo mkfs.ntfs -f /dev/"$1"1 >> /var/log/ntfscopy-verbose
-	echo "Mounting drive..." >> /var/log/ntfscopy-verbose
-	MOUNTPOINT=$(mktemp -dp /mnt/)
+#Formatting, mounting and copying files to the device
+echo $dt Formatting drive $1 as NTFS | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
+        sudo mkfs.ntfs -f /dev/"$1"1 | sudo tee --append /var/log/ntfscopy-verbose
+echo $dt Mounting $DISK"1" to $MOUNTPOINT | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
+	mount $DISK"1" $MOUNTPOINT | sudo tee --append /var/log/ntfscopy-verbose
+echo $dt Copying files from $COPYPATH to $MOUNTPOINT | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
+	sudo rsync -avz $COPYPATH/* $(df "$DISK"1 | awk 'END{print $NF}') | sudo tee --append /var/log/ntfscopy-verbose
 
-echo $dt Copying files from $COPYPATH to $MOUTPOINT  >> /var/log/ntfscopy
-	mount $DISK"1" $MOUNTPOINT
-	echo "Attempting rsync" >> /var/log/ntfscopy-verbose
-	sudo rsync -avz $COPYPATH/* $(df "$DISK"1 | awk 'END{print $NF}') >> /var/log/ntfscopy-verbose
-	
-echo $dt Unmounting $DISK"1"  >> /var/log/ntfscopy
-	umount $DISK"1"
+echo $dt Unmounting $DISK"1" | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
+	umount -v $DISK"1" | sudo tee --append /var/log/ntfscopy-verbose
 
 # Turn off LED 
 	echo 0 | sudo tee /sys/class/leds/led0/brightness 
 
 # Play a sound upon completion
 	( speaker-test -t sine -c 1 -s 1 -f 800 & TASK_PID=$! ; sleep 0.09 ; kill -s SIGINT $TASK_PID ) > /dev/null
-
-echo $dt USB drive $1 wiped formatted and ejected >> /var/log/ntfscopy
-
-# To restore LED outside of script use this command
-# echo mmc0 | sudo tee /sys/class/leds/led0/trigger
 
 else
 	echo "$DISK does not exist, or is not a block device, you must specify a disk such as /dev/sda" 
