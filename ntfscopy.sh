@@ -98,7 +98,7 @@ echo $dt Attempting to unmount all partitions on $1 | sudo tee --append /var/log
 	echo heartbeat | sudo tee /sys/class/leds/led0/trigger
 
 echo $dt Zapping $1 with dd and sfdisk | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
-echo $dt $(lsblk -o name,size,fstype,label,model,serial,mountpoint $DISK) | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
+echo "$dt $(lsblk -o name,size,fstype,label,model,serial,mountpoint $DISK)" | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
 	dd if=/dev/zero of=$DISK bs=4096 count=1 conv=notrunc,fsync | sudo tee --append /var/log/ntfscopy-verbose
 	echo ',,L' | sudo sfdisk --wipe-partitions=always --wipe=always $DISK --no-reread --force | sudo tee --append /var/log/ntfscopy-verbose
 
