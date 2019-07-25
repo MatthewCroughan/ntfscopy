@@ -65,7 +65,7 @@ if [ -z "$(which at)" ]; then
 fi
 
 # Install
-e_arrow_ "Moving scripts to /usr/local/bin"
+e_arrow "Moving scripts to /usr/local/bin"
 try sudo cp ./ntfscopy.sh /usr/local/bin/ntfscopy.sh
 try sudo cp ./detected.sh /usr/local/bin/detected.sh
 
