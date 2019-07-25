@@ -43,12 +43,14 @@ then
   exit 1
 fi
 
+# Get position of the script so that this being ran from elsewhere in the system doesn't impact the script
+e_arrow "Entering directory of the script"
+try cd "$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 e_arrow "Installing ntfscopy"
 # Make config directory
 try sudo mkdir -p /etc/ntfscopy/
 try sudo touch /etc/ntfscopy/config
-# Get position of the script so that this being ran from elsewhere in the system doesn't impact the script
-try cd "$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # We'll need ntfs-3g. Install it if needed.
 if [ -z "$(which ntfs-3g)" ]; then
