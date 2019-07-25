@@ -18,7 +18,7 @@ blue=$(tput setaf 38)
 
 e_header() { printf "\n${bold}${purple}==========  %s  ==========${reset}\n" "$@" 
 }
-e_arrow() { printf "➜ $@\n"
+e_arrow() { printf "${purple}➜ $@\n"
 }
 e_success() { printf "${green}✔ %s${reset}\n" "$@"
 }
@@ -44,7 +44,6 @@ then
 fi
 
 e_arrow "Installing ntfscopy"
-
 # Make config directory
 try sudo mkdir -p /etc/ntfscopy/
 try sudo touch /etc/ntfscopy/config
@@ -53,30 +52,35 @@ try cd "$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # We'll need ntfs-3g. Install it if needed.
 if [ -z "$(which ntfs-3g)" ]; then
-	e_note "I need ntfs-3g and it's missing. I'll install it."
+	e_arrow "I need ntfs-3g and it's missing. I'll install it."
 	try sudo apt-get update
 	try sudo apt-get --no-install-recommends -y install ntfs-3g
 fi
 
 # We'll need at. Install it if needed.
 if [ -z "$(which at)" ]; then
-	e_note "I need at and it's missing. I'll install it."
+	e_arrow "I need at and it's missing. I'll install it."
  	try sudo apt-get update
 	try sudo apt-get --no-install-recommends -y install at
 fi
 
 # Install
+e_arrow_ "Moving scripts to /usr/local/bin"
 try sudo cp ./ntfscopy.sh /usr/local/bin/ntfscopy.sh
 try sudo cp ./detected.sh /usr/local/bin/detected.sh
 
-e_note "If these fail, the service likely does not exist, do not worry."
-
+# Disable automounting
+e_note "If these fail without output, the service does not exist, do not worry."
 try sudo systemctl disable udisks2.service
 try sudo systemctl stop udisks2.service
 
+# Touching the logfiles so they can be written to
+e_arrow "Creating logfiles"
 try sudo touch /var/log/ntfscopy
 try sudo touch /var/log/ntfscopy-verbose
 
+# Installing udev rule
+e_arrow "Installing udev rule"
 try echo 'KERNEL=="sd[a-z]", SUBSYSTEM=="block", ACTION=="add", RUN+="/usr/bin/sudo /usr/local/bin/detected.sh $name"' | sudo tee /etc/udev/rules.d/99-ntfscopy.rules > /dev/null 2>&1 && e_success "Installed udev rule"
-
+e_arrow "Reloading udev rules"
 try sudo udevadm control --reload-rules && e_success "Reloading udev rules"
