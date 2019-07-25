@@ -9,11 +9,22 @@ display_usage() {
   echo "Commands:"  
   echo "    monitor                               Tail the output of the ntfscopy log"
   echo "    monitor verbose                       A more verbose version of monitor"
+  echo "    start                                 Create the udev rule to start processing disks upon plugin"
+  echo "    stop                                  Remove the udev rule, halting any processing of disks upon plug in"
   echo "Options:"  
   echo "    -d                                    Specify the directory containing files with which to copy over with rsync"
   echo "    -r                                    Reset the activity LED on the Pi"
   exit 1
 }
+
+e_success() { printf "${green}✔ %s${reset}\n" "$@"
+}
+e_error() { printf "${red}✖ %s${reset}\n" "$@"
+}
+try() { if "$@"; then e_success "$* succeeded." >&2; else e_error "$* failed." >&2; fi; }
+
+red=$(tput setaf 1)
+green=$(tput setaf 76)
 
 # Applies config settings from /etc/ntfscopy/config
 source /etc/ntfscopy/config
@@ -59,6 +70,20 @@ fi
 if [[ $USER != "root" ]]; then
   echo "You must be root to do this!"
   exit 1
+fi
+
+# Remove the udev rule and reload rules
+if [ "$1" == "stop" ]; then
+  try sudo rm /etc/udev/rules.d/99-ntfscopy.rules
+  try sudo udevadm control --reload-rules
+  exit 0
+fi
+
+# Add the udev rule and reload rules
+if [ "$1" == "start" ]; then
+  try echo 'KERNEL=="sd[a-z]", SUBSYSTEM=="block", ACTION=="add", RUN+="/usr/bin/sudo /usr/local/bin/detected.sh $name"' | sudo tee /etc/udev/rules.d/99-ntfscopy.rules > /dev/null 2>&1
+  try sudo udevadm control --reload-rules && e_success "Reloaded udev rules"
+  exit 0
 fi
 
 # Resets the activity LED of the pi, in case it is stuck.
