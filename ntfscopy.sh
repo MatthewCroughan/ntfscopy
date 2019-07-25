@@ -112,7 +112,11 @@ echo $dt Formatting drive $1 as NTFS | sudo tee --append /var/log/ntfscopy /var/
 echo $dt Mounting $DISK"1" to $MOUNTPOINT | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
 	mount $DISK"1" $MOUNTPOINT | sudo tee --append /var/log/ntfscopy-verbose
 echo $dt Copying files from $COPYPATH to $MOUNTPOINT | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
-	sudo rsync -avz $COPYPATH/* $(df "$DISK"1 | awk 'END{print $NF}') | sudo tee --append /var/log/ntfscopy-verbose
+	sudo rsync -avh $COPYPATH/* $(df "$DISK"1 | awk 'END{print $NF}') | sudo tee --append /var/log/ntfscopy-verbose
+echo $dt Verifying files... $COPYPATH to $MOUNTPOINT | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
+        sudo rsync -avhc $COPYPATH/* $(df "$DISK"1 | awk 'END{print $NF}') | sudo tee --append /var/log/ntfscopy-verbose
+
+
 
 echo $dt Unmounting $DISK"1" | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
 	umount -v $DISK"1" | sudo tee --append /var/log/ntfscopy-verbose
