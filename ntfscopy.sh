@@ -138,13 +138,14 @@ echo $dt Mounting $DISK"1" to $MOUNTPOINT | sudo tee --append /var/log/ntfscopy 
 	mount $DISK"1" $MOUNTPOINT | sudo tee --append /var/log/ntfscopy-verbose
 echo $dt Copying files from $COPYPATH to $MOUNTPOINT | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
 	sudo rsync -avh $COPYPATH/* $(df "$DISK"1 | awk 'END{print $NF}') | sudo tee --append /var/log/ntfscopy-verbose
-echo $dt Verifying files... $COPYPATH to $MOUNTPOINT | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
+echo $dt Verifying file hashes... $COPYPATH to $MOUNTPOINT | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
         sudo rsync -avhc $COPYPATH/* $(df "$DISK"1 | awk 'END{print $NF}') | sudo tee --append /var/log/ntfscopy-verbose
 
 
 
 echo $dt Unmounting $DISK"1" | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
 	umount -v $DISK"1" | sudo tee --append /var/log/ntfscopy-verbose
+echo $dt Feel free to eject $DISK"1" | sudo tee --append /var/log/ntfscopy /var/log/ntfscopy-verbose
 
 # Turn off LED 
 	echo 0 | sudo tee /sys/class/leds/led0/brightness 
