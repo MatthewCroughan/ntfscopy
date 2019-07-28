@@ -6,6 +6,17 @@ cd ntfscopy
 ./install.sh
 ```
 
+If you wish to change the notification sound that is used, simply replace the file `sounds/notification.wav` in this repo and run `./install.sh` again
+
+# Update
+
+Updating or changing aspects of the prgoram can be done by running `install.sh` again.
+
+```
+git pull
+./install.sh
+```
+
 # Usage
 
 ```
@@ -35,4 +46,5 @@ Set the *absolute* path of the directory containing the contents you want via `n
 `ntfscopy.sh monitor` will monitor what is going on
 
 `ntfscopy.sh monitor verbose` will monitor what is going on in more detail.
+
 
