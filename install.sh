@@ -70,6 +70,7 @@ fi
 e_arrow "Moving scripts to /usr/local/bin"
 try sudo cp ./ntfscopy.sh /usr/local/bin/ntfscopy.sh
 try sudo cp ./detected.sh /usr/local/bin/detected.sh
+try sudo cp ./sounds/notification.wav /etc/ntfscopy/notification.wav
 
 # Disable automounting
 e_note "If these fail without output, the service does not exist, do not worry."

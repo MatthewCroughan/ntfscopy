@@ -150,7 +150,8 @@ echo $dt Unmounting $DISK"1" | sudo tee --append /var/log/ntfscopy /var/log/ntfs
 	echo 0 | sudo tee /sys/class/leds/led0/brightness 
 
 # Play a sound upon completion
-	( speaker-test -t sine -c 1 -s 1 -f 800 & TASK_PID=$! ; sleep 0.09 ; kill -s SIGINT $TASK_PID ) > /dev/null
+#	( speaker-test -t sine -c 1 -s 1 -f 800 & TASK_PID=$! ; sleep 0.09 ; kill -s SIGINT $TASK_PID ) > /dev/null ## Uncomment this if you want a more generic cross-platform compatible sound
+	aplay /etc/ntfscopy/notification.wav
 
 else
 	echo "$DISK does not exist, or is not a block device, you must specify a disk such as /dev/sda" 
